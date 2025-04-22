@@ -10,6 +10,19 @@ load_dotenv()
 # Initializes your app with your bot token and socket mode handler
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
+# Constants
+LUNCH_TRAIN_STARTED_TEXT = "*The Hypo Lunch Train has been started by <@{user}>. All aboard!*"
+HUNGRY_CARRIAGE_TEXT = ":hamburger: *Super Hungry Carriage People*\nOnly for the hungriest SG office peeps."
+JOIN_BUTTON = {
+    "type": "button",
+    "text": {"type": "plain_text", "emoji": True, "text": "Join!"},
+    "action_id": "join_lunch_train_action",
+}
+LAUNCH_BUTTON = {
+    "type": "button",
+    "text": {"type": "plain_text", "emoji": True, "text": "We're ready, LET'S GO!"},
+    "action_id": "launch_lunch_train_action",
+}
 
 @app.message("Lunch!!!")
 def message_lunch_train(message, say):
@@ -21,23 +34,13 @@ def message_lunch_train(message, say):
     blocks = [
         {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": f"*The Hypo Lunch Train has been started by <@{message['user']}>. All aboard!*",
-            },
+            "text": {"type": "mrkdwn", "text": LUNCH_TRAIN_STARTED_TEXT.format(user=message["user"])},
         },
         {"type": "divider"},
         {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": ":hamburger: *Super Hungry Carriage People*\nOnly for the hungriest SG office peeps.",
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "emoji": True, "text": "Join!"},
-                "action_id": "join_lunch_train_action",
-            },
+            "text": {"type": "mrkdwn", "text": HUNGRY_CARRIAGE_TEXT},
+            "accessory": JOIN_BUTTON,
         },
         {
             "type": "context",
@@ -49,24 +52,14 @@ def message_lunch_train(message, say):
         {"type": "divider"},
         {
             "type": "actions",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "We're ready, LET'S GO!",
-                    },
-                    "action_id": "launch_lunch_train_action",
-                }
-            ],
+            "elements": [LAUNCH_BUTTON],
         },
     ]
 
     # Send the initial message and store the timestamp for updates
     response = say(
         blocks=blocks,
-        text=f"*The lunch train has been started by <@{message['user']}>. All aboard!*",
+        text=LUNCH_TRAIN_STARTED_TEXT.format(user=message["user"]),
     )
     global lunch_train_message_ts
     lunch_train_message_ts = response["ts"]  # Store the message timestamp
@@ -103,23 +96,13 @@ def join_lunch_train_action(body, ack, client):
         blocks = [
             {
                 "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*The Hypo Lunch Train has been started by <@{lunch_train_starter}>. All aboard!*",
-                },
+                "text": {"type": "mrkdwn", "text": LUNCH_TRAIN_STARTED_TEXT.format(user=lunch_train_starter)},
             },
             {"type": "divider"},
             {
                 "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": ":hamburger: *Super Hungry Carriage People*\nOnly for the hungriest SG office peeps.",
-                },
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "emoji": True, "text": "Join!"},
-                    "action_id": "join_lunch_train_action",
-                },
+                "text": {"type": "mrkdwn", "text": HUNGRY_CARRIAGE_TEXT},
+                "accessory": JOIN_BUTTON,
             },
             {
                 "type": "context",
@@ -135,17 +118,7 @@ def join_lunch_train_action(body, ack, client):
             {"type": "divider"},
             {
                 "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "emoji": True,
-                            "text": "We're ready, LET'S GO!",
-                        },
-                        "action_id": "launch_lunch_train_action",
-                    }
-                ],
+                "elements": [LAUNCH_BUTTON],
             },
         ]
 
@@ -154,7 +127,7 @@ def join_lunch_train_action(body, ack, client):
             channel=body["channel"]["id"],
             ts=lunch_train_message_ts,
             blocks=blocks,
-            text=f"*The lunch train has been started by <@{lunch_train_starter}>!!!*",
+            text=LUNCH_TRAIN_STARTED_TEXT.format(user=lunch_train_starter),
         )
     else:
         # Send a message indicating the user is already in the lunch train
@@ -202,18 +175,12 @@ def launch_lunch_train_action(body, ack, client):
     blocks = [
         {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": f"*The Hypo Lunch Train has been started by <@{lunch_train_starter}>. All aboard!*",
-            },
+            "text": {"type": "mrkdwn", "text": LUNCH_TRAIN_STARTED_TEXT.format(user=lunch_train_starter)},
         },
         {"type": "divider"},
         {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": ":hamburger: *Super Hungry Carriage People*\nOnly for the hungriest SG office peeps.",
-            },
+            "text": {"type": "mrkdwn", "text": HUNGRY_CARRIAGE_TEXT},
         },
         {
             "type": "context",
